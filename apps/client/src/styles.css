@@ -1,0 +1,40 @@
+:root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #17211b; background: #f5f6f2; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+.layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+.sidebar { position: fixed; inset: 0 auto 0 0; width: 260px; display: flex; flex-direction: column; padding: 24px 16px; background: #17251d; color: #f6f8f3; }
+.brand { display: flex; align-items: center; gap: 11px; padding: 0 8px 24px; font-size: 17px; font-weight: 700; letter-spacing: -.02em; }
+.brand-mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: #d7f26a; color: #17251d; font-family: Georgia, serif; }
+.new-button { width: 100%; padding: 11px 13px; border: 1px solid #526158; border-radius: 9px; color: white; background: #25372c; text-align: left; }
+.new-button:hover { background: #304537; }
+.document-list { display: flex; flex-direction: column; gap: 4px; margin-top: 24px; overflow: auto; }
+.document-list button { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 0; border-radius: 8px; color: #c8d0ca; background: transparent; text-align: left; }
+.document-list button:hover, .document-list .selected { color: white; background: #2a3c31; }
+.document-list small { color: #7f9085; font-size: 11px; }
+.db-label { margin-top: auto; padding: 12px 8px 0; color: #849187; font-size: 12px; }
+.db-label span { display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: #86c95a; box-shadow: 0 0 0 3px #86c95a22; }
+.workspace { grid-column: 2; min-width: 0; }
+.topbar { position: sticky; z-index: 2; top: 0; display: flex; justify-content: space-between; align-items: center; height: 64px; padding: 0 32px; border-bottom: 1px solid #e2e5df; background: #f5f6f2dd; backdrop-filter: blur(10px); }
+.save-status { color: #798078; font-size: 13px; }
+.save-status.error { color: #ad473e; }
+.actions { display: flex; gap: 8px; }
+.actions button { padding: 8px 14px; border: 0; border-radius: 8px; color: white; background: #263a2e; }
+.actions .danger { color: #a43831; background: #f1dfdc; }
+.page { width: min(860px, calc(100% - 48px)); min-height: calc(100vh - 104px); margin: 40px auto; padding: 64px 72px; border: 1px solid #e3e5df; border-radius: 12px; background: #fff; box-shadow: 0 16px 44px #263a2e0b; }
+.title { width: 100%; margin-bottom: 28px; padding: 0; border: 0; outline: none; color: #17211b; background: transparent; font-family: Georgia, serif; font-size: clamp(38px, 6vw, 54px); font-weight: 500; letter-spacing: -.045em; }
+.error-banner { margin-bottom: 18px; padding: 10px 12px; border-radius: 7px; color: #9a332c; background: #fae9e6; font-size: 13px; }
+.editor-shell { border-top: 1px solid #eceee9; }
+.toolbar { position: sticky; top: 74px; z-index: 1; display: flex; flex-wrap: wrap; gap: 4px; padding: 12px 0; background: white; }
+.toolbar button { min-height: 32px; padding: 5px 9px; border: 1px solid transparent; border-radius: 6px; color: #5a655d; background: transparent; }
+.toolbar button:hover { background: #f0f2ed; }
+.toolbar button.active { border-color: #dce8b1; color: #314316; background: #eff6d5; }
+.editor-content { min-height: 420px; outline: none; color: #29322c; font-family: Georgia, serif; font-size: 18px; line-height: 1.72; }
+.editor-content p { margin: .7em 0; }
+.editor-content h1, .editor-content h2, .editor-content h3 { margin: 1.1em 0 .35em; line-height: 1.2; }
+.editor-content blockquote { margin-left: 0; padding-left: 18px; border-left: 3px solid #c8d78e; color: #59635c; }
+.editor-content pre { padding: 16px; border-radius: 8px; color: #e8eee9; background: #1e2922; font: 14px/1.6 ui-monospace, monospace; }
+.editor-content a { color: #527112; text-decoration-color: #bdd36e; text-underline-offset: 3px; }
+.editor-content p.is-editor-empty:first-child::before { float: left; height: 0; color: #aab0aa; content: "Начните писать…"; pointer-events: none; }
+@media (max-width: 760px) { .layout { display: block; } .sidebar { position: static; width: 100%; height: auto; padding: 14px; } .brand { padding-bottom: 12px; } .document-list, .db-label { display: none; } .workspace { width: 100%; } .topbar { padding: 0 16px; } .page { width: 100%; min-height: calc(100vh - 140px); margin: 0; padding: 36px 22px; border: 0; border-radius: 0; } }
