@@ -2,6 +2,8 @@
 
 Локальное full-stack приложение заметок: React + TypeScript + Vite, Tiptap, Node.js/Express и PostgreSQL. Идентификаторы документов и блоков создаются как UUID v7. Контент хранится в `jsonb` в формате блоков BlockNote (`id`, `type`, `props`, `content`, `children`).
 
+Подробное описание транзакционного сохранения: [docs/saving.md](docs/saving.md).
+
 ## Запуск
 
 Требуются Node.js 22+, npm и Docker.
@@ -26,11 +28,13 @@ npm run dev
 
 ## API
 
-- `GET /api/documents`
-- `GET /api/documents/:id`
-- `POST /api/documents`
-- `PUT /api/documents/:id`
-- `DELETE /api/documents/:id`
+- `GET /api/notes`
+- `GET /api/notes/:noteId`
+- `POST /api/notes`
+- `PUT /api/notes/:noteId`
+- `PATCH /api/notes/:noteId/blocks` — пакетные операции `create`, `update`, `delete`, `move`
+- `POST /api/notes/:noteId/saveTransactions` — атомарное сохранение транзакций `create`, `update`, `delete`, `move`
+- `DELETE /api/notes/:noteId`
 
 Тело POST/PUT:
 
@@ -46,3 +50,13 @@ npm run dev
   }]
 }
 ```
+
+`GET /api/notes/:noteId` возвращает плоский массив блоков. Каждый блок содержит
+`parentId` и относительную позицию `{ before, after }`, где значения — UUID
+соседних блоков или `null` на границе списка. Клиент восстанавливает дерево
+`children` по `parentId`.
+
+Фронтенд сохраняет изменения блоков через `saveTransactions`: через 1 секунду
+после последнего изменения или принудительно через 5 секунд после начала
+непрерывной серии изменений. В транзакцию попадают только операции над
+изменившимися блоками, а не вся заметка.

@@ -20,13 +20,13 @@ function toInline(nodes: JSONContent[] = []): InlineContent[] {
 }
 
 function block(type: string, node: JSONContent, props: Record<string, unknown> = {}, children: BlockNoteBlock[] = []): BlockNoteBlock {
-  return { id: uuidv7(), type, props: { ...defaultProps, ...props }, content: toInline(node.content), children };
+  return { id: typeof node.attrs?.blockId === "string" ? node.attrs.blockId : uuidv7(), type, props: { ...defaultProps, ...props }, content: toInline(node.content), children };
 }
 
 function convertNode(node: JSONContent): BlockNoteBlock[] {
   switch (node.type) {
     case "heading": return [block("heading", node, { level: Number(node.attrs?.level ?? 1) })];
-    case "blockquote": return (node.content ?? []).map((child) => block("quote", child));
+    case "blockquote": return [block("quote", { ...node, content: node.content?.[0]?.content ?? [] })];
     case "codeBlock": return [block("codeBlock", node, { language: node.attrs?.language ?? "text" })];
     case "bulletList": return (node.content ?? []).map((item) => listItem("bulletListItem", item));
     case "orderedList": return (node.content ?? []).map((item) => listItem("numberedListItem", item));
@@ -36,7 +36,7 @@ function convertNode(node: JSONContent): BlockNoteBlock[] {
 
 function listItem(type: string, item: JSONContent): BlockNoteBlock {
   const [first, ...nested] = item.content ?? [];
-  return block(type, first ?? { type: "paragraph" }, {}, nested.flatMap(convertNode));
+  return block(type, { ...(first ?? { type: "paragraph" }), attrs: { ...(first?.attrs ?? {}), blockId: item.attrs?.blockId } }, {}, nested.flatMap(convertNode));
 }
 
 export function tiptapToBlockNote(doc: JSONContent): BlockNoteBlock[] {
@@ -56,14 +56,14 @@ function fromInline(content: BlockNoteBlock["content"]): JSONContent[] {
   });
 }
 
-function paragraph(block: BlockNoteBlock): JSONContent { return { type: "paragraph", content: fromInline(block.content) }; }
+function paragraph(block: BlockNoteBlock): JSONContent { return { type: "paragraph", attrs: { blockId: block.id }, content: fromInline(block.content) }; }
 
 function fromBlock(block: BlockNoteBlock): JSONContent {
-  if (block.type === "heading") return { type: "heading", attrs: { level: Number(block.props.level ?? 1) }, content: fromInline(block.content) };
-  if (block.type === "quote") return { type: "blockquote", content: [paragraph(block)] };
-  if (block.type === "codeBlock") return { type: "codeBlock", attrs: { language: block.props.language ?? null }, content: fromInline(block.content) };
+  if (block.type === "heading") return { type: "heading", attrs: { level: Number(block.props.level ?? 1), blockId: block.id }, content: fromInline(block.content) };
+  if (block.type === "quote") return { type: "blockquote", attrs: { blockId: block.id }, content: [{ type: "paragraph", content: fromInline(block.content) }] };
+  if (block.type === "codeBlock") return { type: "codeBlock", attrs: { language: block.props.language ?? null, blockId: block.id }, content: fromInline(block.content) };
   if (["bulletListItem", "numberedListItem"].includes(block.type)) {
-    return { type: block.type === "bulletListItem" ? "bulletList" : "orderedList", content: [{ type: "listItem", content: [paragraph(block), ...block.children.map(fromBlock)] }] };
+    return { type: block.type === "bulletListItem" ? "bulletList" : "orderedList", content: [{ type: "listItem", attrs: { blockId: block.id }, content: [{ type: "paragraph", content: fromInline(block.content) }, ...block.children.map(fromBlock)] }] };
   }
   return paragraph(block);
 }

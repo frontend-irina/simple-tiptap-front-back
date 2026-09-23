@@ -4,12 +4,13 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import type { BlockNoteBlock } from "@app/shared";
 import { blockNoteToTiptap, tiptapToBlockNote } from "./blocknote";
+import { BlockId } from "./BlockId";
 
 type Props = { blocks: BlockNoteBlock[]; onChange: (blocks: BlockNoteBlock[]) => void };
 
 export function Editor({ blocks, onChange }: Props) {
   const editor = useEditor({
-    extensions: [StarterKit, Link.configure({ openOnClick: false })],
+    extensions: [StarterKit, Link.configure({ openOnClick: false }), BlockId],
     content: blockNoteToTiptap(blocks),
     editorProps: { attributes: { class: "editor-content" } },
     onUpdate: ({ editor }) => onChange(tiptapToBlockNote(editor.getJSON()))
